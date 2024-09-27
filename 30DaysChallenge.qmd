@@ -1,0 +1,439 @@
+---
+title: "30DaysChanllenge"
+author: "Cristian Guerrero Balber"
+format: html
+editor: visual
+---
+
+## Categoría: "Comparisons"
+
+### Día 1: Part-to-Whole
+
+<iframe title="¿Cómo se distribuye la riqueza mundial por sectores?" aria-label="Donut Chart" id="datawrapper-chart-N4Zj2" src="https://datawrapper.dwcdn.net/N4Zj2/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="608" data-external="1">
+
+</iframe>
+
+```{=html}
+<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+**Audiencia:** Grupo de estudiantes de economía\
+**Objetivo:** Mostrar los sectores industriales donde se genera más riqueza con todas las posibilidades de estrategia que ello conlleva, como la inversión o el estudio de un sector u otro.\
+**Visualización:** Herramienta Datawrapper para realizar un gráfico de rosquilla, convirtiendo los valores netos a porcentajes.\
+**Conjunto de datos:** Se realiza una agregación por sector industrial sumando los valores netos por cada registro. La fuente de datos es la siguiente: [https://www.kaggle.com/datasets/muhammadehsan02/top-1000-wealthiest-people-in-the-world/data](#0){.uri}
+
+### Día 2: Neo
+
+<iframe title="¿Quién quiere ser millonario? ¡Top 10 de las personas más ricas del mundo en 2024!" aria-label="Bar Chart" id="datawrapper-chart-n7LNH" src="https://datawrapper.dwcdn.net/n7LNH/2/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="379" data-external="1">
+
+</iframe>
+
+```{=html}
+<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+**Audiencia:** Grupo de estudiantes de economía\
+**Objetivo:** Informar sobre quiénes son las personas que dominan el planeta económicamente y las cantidades de sus riquezas.\
+**Visualización:** Herramienta Datawrapper para realizar un gráfico de barras horizontal.\
+**Conjunto de datos:** De nuevo, el origen de los datos es el mismo que antes: [https://www.kaggle.com/datasets/muhammadehsan02/top-1000-wealthiest-people-in-the-world/data](#0){.uri}. Se realiza una agregación por nombre de persona y sumando sus riquezas, las cuales pueden proceder de diferentes sectores industriales y, por lo tanto, la misma persona puede aparecer en más de un registro.
+
+### Día 3: Makeover
+
+![Gráfico generado por IA - DALL-E a través de ChatGPT](\external_images\D3.png)
+
+**Audiencia:** Grupo de estudiantes de economía\
+**Objetivo:** Mostrar los sectores industriales donde se genera más riqueza con todas las posibilidades de estrategia que ello conlleva, como la inversión o el estudio de un sector u otro.\
+**Visualización:** En esta ocasión, se crea un gráfico muy visual y espectacular usando IA Generativa en base a la gráfica del primer día. El gran inconveniente de este tipo de herramientas para la creación de gráficas es el bajo control que se tiene sobre lo que aparece en la imagen por mucho que se refina el *prompt*. Por ejemplo, se ha distorsionado algunas etiquetas de sectores así como los valores asociados. Es decir, es una herramienta muy potente y espectacular pero aún mejorable desde el punto de vista del control.\
+**Conjunto de datos:** Se utiliza como *prompt* la imagen gráfica del día 1 (Part-to-whole) además del siguiente texto: "Create an image of a pie chart with an original style, including 3D figures related to each industrial sector. The sectors should be represented as follows: Technology (35%) with images such as computers or smartphones, Retail (23%) with images like shopping bags or a storefront, Manufacturing (10%) with icons like gears or a factory, Telecommunications (6%) with symbols such as satellite dishes or cell towers, Media (6%) with elements like film reels or cameras, and Other (22%) with assorted icons that represent various industries. Include the labels with words of sectors and percentages and ensure that they are clear and undistorted."
+
+### Día 4: Waffle
+
+```{r}
+# Instalar y cargar los paquetes
+library(waffle)
+
+# Datos
+dataset <- read.csv("datasets\\Top_1000_wealthiest_people_d4.csv")
+
+#Se convierten los datos a un vector nombrado
+valores <- (setNames(dataset$Net.Worth..in.billions., dataset$Company))
+
+# Crear el gráfico de waffle
+waffle_chart <- waffle(valores, rows = 10, size =1,
+                       colors = rainbow(length(valores))) +
+  labs(title = "Distribución de la riqueza mundial por empresas", subtitle = "Gráfico de waffle de 100 unidades")
+
+
+# Mostrar el gráfico
+waffle_chart
+
+```
+
+**Audiencia:** Grupo de estudiantes de economía\
+**Objetivo:** Mostrar la distribución de empresas que generan más riquezas a las personas más ricas del planeta. Cuanto más riqueza genera, más cuadrados de color tiene asociado.\
+**Visualización:** Se utiliza un waffle chart utilizando la librería de R "waffle".\
+**Conjunto de datos:** El origen de los datos sigue siendo el mismo: [https://www.kaggle.com/datasets/muhammadehsan02/top-1000-wealthiest-people-in-the-world/data](#0){.uri}. En esta ocasión, se realiza una agregación por empresas sumando el valor de la riqueza. Además, se normalizan los datos calculando la proporción sobre 100 de cada empresa y convirtiéndolas en un número entero para obtener este tipo de dato, necesario en tipo y forma para este tipo de gráfica.
+
+### Día 5: Diverging
+
+```{r, fig.width=8, fig.height=20}
+library(ggplot2)
+
+# Datos de ejemplo
+datos <- read.csv("datasets\\Inequality in Income Spain Comparison_d5.csv")
+
+datos$Desigualdad <- ifelse(datos$Inequality.in.income..2021. > 0, "Mayor desigualdad que España", "Menor desigualdad que España")
+
+# Crear el gráfico
+ggplot(data = datos, aes(x = reorder(Country, Inequality.in.income..2021.), 
+                          y = Inequality.in.income..2021., 
+                          fill = Desigualdad)) +
+  geom_bar(stat = "identity", width = 0.5, color = "black") +
+  coord_flip() +  
+  scale_fill_manual(values = c("pink", "lightblue")) +
+  labs(title = "¿Qué países enfrentan una mayor desigualdad de ingresos en comparación con España?",
+       x = "País",
+       y = "Diferencia de GINI con respecto a España",
+       fill = "Diferencia de desigualdad en ingresos") +
+  theme_minimal() + 
+  theme(panel.spacing = unit(100, "lines"),
+        plot.title = element_text(size = 9, face = "bold")) 
+
+```
+
+**Audiencia:** Grupo de estudiantes de economía\
+**Objetivo:** Concienciar de la posición que ocupa España con respecto al resto de países del mundo en relación a la desigualdad de ingresos de sus habitantes.\
+**Visualización:** Se utiliza la librería "ggplot2" de R. El gráfico elegido es un gráfico horizontal de barras modificando los colores en función de si es mejor o peor el resultado en comparación con España.\
+**Conjunto de datos:** <https://www.kaggle.com/datasets/iamsouravbanerjee/inequality-in-income-across-the-globe>. Se modifica la columna "Inequality in income (2021)", donde se muestra el GINI por país, para calcular cada una con respecto a España, restándole el valor GINI de España a cada valor GINI del resto de los países. De esta manera, se consigue el efecto deseado y se puede realizar una comparación con el país de interés.
+
+### Día 6: OECD (data day)
+
+![Gráfico generado en PowerBI](\external_images\D6.png)
+
+**Audiencia:** Grupo de estudiantes de economía\
+**Objetivo:** Resaltar aquellos continentes con una mayor desigualdad en cuanto a ingresos en sus países.\
+**Visualización:** Se realiza a través de **PowerBI**. Se usa una gráfica de embudo con un degradado de colores para mostrar los resultados de "peor" (mayor GINI promedio) a "mejor" (menor GINI promedio).\
+**Conjunto de datos:** Se usa el mismo dataset del día anterior: [https://www.kaggle.com/datasets/iamsouravbanerjee/inequality-in-income-across-the-globe](#0){.uri}. En esta ocasión, se ha realizado el promedio de todos los paises por continente y se ha ordenado de mayor a menor.
+
+## Categoría: "Distributions"
+
+### Día 7: Hazards
+
+```{python echo = FALSE, message = FALSE, warning = FALSE}
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Se carga el dataset
+df = pd.read_csv("datasets//annual_deaths_by_causes.csv")
+
+# Se realizan las transformaciones adecuadas para la correcta visualización
+df = df[df.code != "OWID_WRL"]
+cols_causes = df.columns[3:]
+df = pd.melt(df,id_vars = ['country', 'code'],value_vars = cols_causes,var_name = "cause_of_death",value_name = "number_of_people")
+df = df.groupby('cause_of_death')['number_of_people'].sum().reset_index()
+df.sort_values(by = 'number_of_people', ascending = False, inplace = True)
+df.reset_index(drop = True, inplace = True)
+
+# Cálculo de características del boxplot
+Q1 = df.number_of_people.quantile(0.25)
+Q3 = df.number_of_people.quantile(0.75)
+IQR = Q3 - Q1
+lim_sup = Q3 + IQR * 1.5
+lim_inf = Q1 - IQR * 1.5
+
+# Identifico los outliers
+outliers = df[(df.number_of_people > lim_sup) | (df.number_of_people < lim_inf)]
+
+# Se carga el tema "pastel" de sns
+sns.set_theme(style="ticks", palette="pastel")
+# Se pinta el boxplot
+sns.boxplot(y="number_of_people", data=df, palette = ["g"], legend = False)
+plt.title("Distribución de muertes mundiales acumuladas por tipo de enfermedad (1990-2019)")
+
+# Etiqueto los outliers
+for i, row in outliers.iterrows():
+  plt.text(-0.02, row.number_of_people, f'{row.cause_of_death}', color = 'black',
+           ha = 'right', va = 'center', fontsize = 8)
+# Muestro la figura
+plt.show()
+
+
+```
+
+**Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
+**Objetivo:** Se pretende mostrar la distribución de número acumulado de causas de muerte desde 1990 hasta 2019 con el fin de determinar si existen ciertas enfermedades que, en comparación con el resto, tienen una incidencia mucho más alta o baja.\
+**Visualización:** Se utiliza la librería **matplotlib.pyplot** junto con **seaborn** de **python**. Se escoge un gráfico **boxplot**, ideal para identificar visualmente outliers.\
+**Conjunto de datos:** <https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019>. Previo al graficado de datos, se ha de calcular programáticamente los outliers para que puedan ser etiquetados en el boxplot. De esta manera, la audiencia puede identificar fácilmente aquellas enfermedades que están fuera de la normalidad.
+
+### Día 8: Circular
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(ggrepel)
+library(tidyverse)
+
+#Obtengo el dataframe del csv
+df <- read.csv("datasets\\annual_deaths_by_causes.csv")
+
+#Extraigo todas las columnas de las causas de muerte
+cols_causes <- names(df)[4:ncol(df)]
+
+#Se transforma el dataframe
+df_transformed <- df %>%
+  pivot_longer(cols = cols_causes, 
+               names_to = "cause_of_death",
+               values_to = "number_of_people") %>%
+  filter(country == "Spain")  %>%
+  group_by(cause_of_death) %>%
+  summarise(total_people = sum(number_of_people)) %>%
+  arrange(desc(total_people)) %>%
+  drop_na()
+
+#Se añaden los porcentajes
+total_sum <- sum(df_transformed$total_people)
+df_transformed <- df_transformed %>%
+  mutate(percentage = round((total_people / total_sum)*100, 0))
+#Se divide el df en dos partes: las primeras 5 filas y el resto
+df_top5 <- df_transformed[1:5, ]
+df_others <- df_transformed[6:nrow(df), ]
+
+#Sumar los valores de otros
+df_others_summary <- df_others %>%
+  summarise(cause_of_death = "Others",
+            total_people = sum(total_people, na.rm = TRUE),
+            percentage = sum(percentage, na.rm = TRUE))
+
+#Se combinan los primeros 5 valores y el grupo "Otros"
+df_final <- bind_rows(df_top5, df_others_summary)
+
+#Se realiza un gráfico de sectores con etiquetas fuera del gráfico
+
+# Obtener las posiciones
+df2 <- df_final %>% 
+  mutate(csum = rev(cumsum(rev(percentage))), 
+         pos = percentage/2 + lead(csum, 1),
+         pos = if_else(is.na(pos), percentage/2, pos))
+
+ggplot(df_final, aes(x = "" , y = percentage, fill = fct_inorder(cause_of_death))) +
+  geom_col(width = 1, color = 1) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Pastel1") +
+  geom_label_repel(data = df2,
+                   aes(y = pos, label = paste0(percentage, "%")),
+                   size = 4.5, nudge_x = 1, show.legend = FALSE) +
+  guides(fill = guide_legend(title = "Grupo")) +
+  ggtitle("Distribución de Causas de Muerte en España") +
+  theme_void() 
+```
+
+**Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
+**Objetivo:** Focalizar los esfuerzos de investigación para las enfermedades más relevantes\
+**Visualización:** Se utiliza ggplot2 con la librería ggrepel. Con esto se consigue un gráfico de sectores con el etiquetado fuera del propio gráfico con una visualización, como resultado, más clara.\
+**Conjunto de datos:** Origen: <https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019>. Se necesita transformar el dataset original cambiando la estructura, pasando las columnas de las enfermedades a una sola columna como "causes_of_death" y sus valores a otra columna llamada "number_of_people". A partir de aquí, se realizan transformaciones varias de limpieza, agregaciones y sumas, para obtener los valores mostrados. Se comprueba que España tiene una distribución similar a la mundial, dado que las tres grandes enfermedades que afectan a este país son las mismas.
+
+### Día 9: Major/Minor
+
+![Gráfico generado en PowerBI](\external_images\D9.png)
+
+**Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
+**Objetivo:** \ Mostrar los países con mayor y menor incidencia en muertes debido a neoplasia (cáncer) en 2019 con el fin de reflexionar sobre qué puede llevar a dichos países a alcanzar estas cifras.
+**Visualización:** **PowerBI**. Se escoge dos visualizaciones de tipo **Tarjeta** para mostrar el país así como la cifra de incidencias por cada 100 mil habitantes.\
+**Conjunto de datos:** <https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019>, <https://worldpopulationreview.com/>. Para poder realizar dicha visualización, con PowerBI se importan los datos preprocesados desde Python realizando un derretido de las columnas de enfermedades. Luego, se crean campos calculados para mostrar los datos deseados, el país con mayor/menor número de muertes por cada 100 mil habitantes y la cifra. Además, se añaden ciertos filtros para que solo se tenga en cuenta la enfermedad de neoplasia y el año 2019 (fecha más actual de la que se tienen datos).
+
+### Día 10: Physical
+
+<iframe title="Muertes por enfermedades cardiovasculares por país en 2010" aria-label="Map" id="datawrapper-chart-izgyy" src="https://datawrapper.dwcdn.net/izgyy/2/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="458" data-external="1">
+
+</iframe>
+
+```{=html}
+<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+```{=html}
+<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+**Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
+**Objetivo:** Transmitir una visión general de la distribución de afección de la enfermedad con la incidencia más alta de muertes en el planeta.\
+**Visualización:** **Datawrapper**. Así como los mapas físicos muestran con colores las propiedades físicas de un mapa, se utiliza el mismo concepto para mostrar la incidencia de muertes por enfermedades cardiovasculares por país (por cada 100 mil habitantes).\
+**Conjunto de datos:** <https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019>, <https://worldpopulationreview.com/>. Para poder realizar dicha visualización, primero se preprocesan los datos con Python realizando un derretido de las columnas de enfermedades. Luego, se importan los datos a PowerBI, donde se realizará una conexión entre dos tablas de dos fuentes de datos diferentes (mencionadas anteriormente). Estas tienen como campo identificativo el país. A partir de aquí, se puede añadir la cantidad de habitantes por país y realizar el cálculo de número de muertes por cada 100 mil habitantes. Además, se añaden ciertos filtros para que solo se tenga en cuenta las enfermedades cardiovasculares y el año 2010 (fecha más actual de la que se tienen datos para combinar en ambos datasets). Una vez se preprocesan los datos, se importan a Datawrapper para poder crear el mapa interactivo y poder embeberlo en RStudio con Quarto.
+
+### Día 11: Mobile-friendly
+
+**Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:** <https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019>
+
+### Día 12: Reuters Graphics (theme day)
+
+<iframe title="Evolución de causas de muertes a nivel mundial desde 1990 hasta 2019" aria-label="Interactive line chart" id="datawrapper-chart-DQaw5" src="https://datawrapper.dwcdn.net/DQaw5/5/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="445" data-external="1">
+
+</iframe>
+
+```{=html}
+<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+**Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
+**Objetivo:** Reflexionar sobre qué es lo que está ocurriendo en el mundo para que el número de fallecidos mundiales a causa de ciertas enfermedades haya aumentado en las últimas décadas.\
+**Visualización: Datawrapper**. Se usa un gráfico de líneas para visualizar la evolución de las enfermedades. Al usar esta herramienta embebida, se da la posibilidad a la audiencia de revisar los datos de forma interactiva.\
+**Conjunto de datos:** [https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019](#0){.uri}. Se preparan los datos eliminando las columnas de "country" y de "code". Además, se realiza una agrupación por "year" para graficar la evolución.
+
+## Categoría: "Relationships"
+
+### Día 13: Family
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 14: Heatmap
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 15: Historical
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 16: Weather
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 17: Networks
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 18: Asian Development Bank (data day)
+
+```{r}
+library(ggplot2)
+altura<- c(180, 175, 190, 189, 180, 179, 165, 158, 169, 175, 150, 170, 195)
+peso <- c(80,75,85,90,87,86,65,67,70,54,68,70,90)
+datos <- data.frame(peso <- peso, altura <- altura)
+ggplot(data = datos, aes(x = altura, y = peso, color = "red")) + geom_point() + geom_line()
+```
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+## Categoría: "Timeseries"
+
+### Día 19: Dinosaurs
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 20: Correlation
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 21: Green Energy
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 22: Mobility
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 23: Tiles
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 24: ILO Region for Africa (data day)
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+## Categoría: "Uncertainties"
+
+### Día 25: Global Change
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 26: AI
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 27: Good/Bad
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 28: Trend
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 29: Black'n'White
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+### Día 30: FiveThirtyEight (theme day)
+
+**Audiencia:**\
+**Objetivo:**\
+**Visualización:**\
+**Conjunto de datos:**
+
+```{=html}
+<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
+<iframe title="Net Worth (in billions) by Industry" aria-label="Bar Chart" id="datawrapper-chart-SpQmI" src="https://datawrapper.dwcdn.net/SpQmI/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="395" data-external="1">
+
+</iframe>
+
+```{=html}
+<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
