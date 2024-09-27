@@ -240,8 +240,7 @@ ggplot(df_final, aes(x = "" , y = percentage, fill = fct_inorder(cause_of_death)
 ![Gráfico generado en PowerBI](\external_images\D9.png)
 
 **Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
-**Objetivo:** \ Mostrar los países con mayor y menor incidencia en muertes debido a neoplasia (cáncer) en 2019 con el fin de reflexionar sobre qué puede llevar a dichos países a alcanzar estas cifras.
-**Visualización:** **PowerBI**. Se escoge dos visualizaciones de tipo **Tarjeta** para mostrar el país así como la cifra de incidencias por cada 100 mil habitantes.\
+**Objetivo:**  Mostrar los países con mayor y menor incidencia en muertes debido a neoplasia (cáncer) en 2019 con el fin de reflexionar sobre qué puede llevar a dichos países a alcanzar estas cifras. **Visualización:** **PowerBI**. Se escoge dos visualizaciones de tipo **Tarjeta** para mostrar el país así como la cifra de incidencias por cada 100 mil habitantes.\
 **Conjunto de datos:** <https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019>, <https://worldpopulationreview.com/>. Para poder realizar dicha visualización, con PowerBI se importan los datos preprocesados desde Python realizando un derretido de las columnas de enfermedades. Luego, se crean campos calculados para mostrar los datos deseados, el país con mayor/menor número de muertes por cada 100 mil habitantes y la cifra. Además, se añaden ciertos filtros para que solo se tenga en cuenta la enfermedad de neoplasia y el año 2019 (fecha más actual de la que se tienen datos).
 
 ### Día 10: Physical
@@ -265,10 +264,18 @@ ggplot(df_final, aes(x = "" , y = percentage, fill = fct_inorder(cause_of_death)
 
 ### Día 11: Mobile-friendly
 
+<iframe title="Muertes por Enfermedades Crónicas Respiratorias" aria-label="Table" id="datawrapper-chart-tefuF" src="https://datawrapper.dwcdn.net/tefuF/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="795" data-external="1">
+
+</iframe>
+
+```{=html}
+<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
+```
 **Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
 **Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:** <https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019>
+**Visualización: Datawrapper.** Se usa esta herramienta por tener la opción de embeber de forma interactiva y, además, hacerlo adaptativo para móviles. Para ello, se ha optado por una visualización en tabla con degradado por gravedad de incidencia. Para hacerlo "mobile-friendly" se activan las opciones "Mobile fallback" y "Compact layout". Además, se le da interactividad mediante la activación de búsqueda de países mediante la opción "Make searchable".\
+**Conjunto de datos:** <https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019>, <https://worldpopulationreview.com/>. Para esta visualización, se aprovecha todo el procesamiento de las gráficas anteriores con la diferencia que se ha filtrado por una enfermedad distinta, "chronic_respiratory_diseases", que es la tercera con más incidencia en el planeta.
 
 ### Día 12: Reuters Graphics (theme day)
 
@@ -283,7 +290,7 @@ ggplot(df_final, aes(x = "" , y = percentage, fill = fct_inorder(cause_of_death)
 **Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
 **Objetivo:** Reflexionar sobre qué es lo que está ocurriendo en el mundo para que el número de fallecidos mundiales a causa de ciertas enfermedades haya aumentado en las últimas décadas.\
 **Visualización: Datawrapper**. Se usa un gráfico de líneas para visualizar la evolución de las enfermedades. Al usar esta herramienta embebida, se da la posibilidad a la audiencia de revisar los datos de forma interactiva.\
-**Conjunto de datos:** [https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019](#0){.uri}. Se preparan los datos eliminando las columnas de "country" y de "code". Además, se realiza una agrupación por "year" para graficar la evolución.
+**Conjunto de datos:** [https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019](#0){.uri}. Se preparan los datos eliminando las columnas de "country" y de "code". Además, se realiza una agrupación por "year" para graficar la evolución. Se calcula la media del ratio de crecimiento de la población mundial en base a <https://worldpopulationreview.com/>.
 
 ## Categoría: "Relationships"
 

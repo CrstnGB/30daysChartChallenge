@@ -290,10 +290,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="día-11-mobile-friendly" class="level3">
 <h3 class="anchored" data-anchor-id="día-11-mobile-friendly">Día 11: Mobile-friendly</h3>
+<iframe title="Muertes por Enfermedades Crónicas Respiratorias" aria-label="Table" id="datawrapper-chart-tefuF" src="https://datawrapper.dwcdn.net/tefuF/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="795" data-external="1">
+</iframe>
+<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
+</script>
 <p><strong>Audiencia:</strong> Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España<br>
 <strong>Objetivo:</strong><br>
-<strong>Visualización:</strong><br>
-<strong>Conjunto de datos:</strong> <a href="https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019" class="uri">https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019</a></p>
+<strong>Visualización: Datawrapper.</strong> Se usa esta herramienta por tener la opción de embeber de forma interactiva y, además, hacerlo adaptativo para móviles. Para ello, se ha optado por una visualización en tabla con degradado por gravedad de incidencia. Para hacerlo “mobile-friendly” se activan las opciones “Mobile fallback” y “Compact layout”. Además, se le da interactividad mediante la activación de búsqueda de países mediante la opción “Make searchable”.<br>
+<strong>Conjunto de datos:</strong> <a href="https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019" class="uri">https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019</a>, <a href="https://worldpopulationreview.com/" class="uri">https://worldpopulationreview.com/</a>. Para esta visualización, se aprovecha todo el procesamiento de las gráficas anteriores con la diferencia que se ha filtrado por una enfermedad distinta, “chronic_respiratory_diseases”, que es la tercera con más incidencia en el planeta.</p>
 </section>
 <section id="día-12-reuters-graphics-theme-day" class="level3">
 <h3 class="anchored" data-anchor-id="día-12-reuters-graphics-theme-day">Día 12: Reuters Graphics (theme day)</h3>
@@ -304,7 +308,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Audiencia:</strong> Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España<br>
 <strong>Objetivo:</strong> Reflexionar sobre qué es lo que está ocurriendo en el mundo para que el número de fallecidos mundiales a causa de ciertas enfermedades haya aumentado en las últimas décadas.<br>
 <strong>Visualización: Datawrapper</strong>. Se usa un gráfico de líneas para visualizar la evolución de las enfermedades. Al usar esta herramienta embebida, se da la posibilidad a la audiencia de revisar los datos de forma interactiva.<br>
-<strong>Conjunto de datos:</strong> <a href="#0" class="uri">https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019</a>. Se preparan los datos eliminando las columnas de “country” y de “code”. Además, se realiza una agrupación por “year” para graficar la evolución.</p>
+<strong>Conjunto de datos:</strong> <a href="#0" class="uri">https://www.kaggle.com/datasets/madhurpant/world-deaths-and-causes-1990-2019</a>. Se preparan los datos eliminando las columnas de “country” y de “code”. Además, se realiza una agrupación por “year” para graficar la evolución. Se calcula la media del ratio de crecimiento de la población mundial en base a <a href="https://worldpopulationreview.com/" class="uri">https://worldpopulationreview.com/</a>.</p>
 </section>
 </section>
 <section id="categoría-relationships" class="level2">
