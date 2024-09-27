@@ -39,7 +39,7 @@ editor: visual
 
 ### Día 3: Makeover
 
-![Gráfico generado por IA - DALL-E a través de ChatGPT](\external_images\D3.png)
+![Gráfico generado en PowerBI](external_images/D3.png)
 
 **Audiencia:** Grupo de estudiantes de economía\
 **Objetivo:** Mostrar los sectores industriales donde se genera más riqueza con todas las posibilidades de estrategia que ello conlleva, como la inversión o el estudio de un sector u otro.\
@@ -108,7 +108,7 @@ ggplot(data = datos, aes(x = reorder(Country, Inequality.in.income..2021.),
 
 ### Día 6: OECD (data day)
 
-![Gráfico generado en PowerBI](\external_images\D6.png)
+![Gráfico generado en PowerBI](external_images/D6.png)
 
 **Audiencia:** Grupo de estudiantes de economía\
 **Objetivo:** Resaltar aquellos continentes con una mayor desigualdad en cuanto a ingresos en sus países.\
@@ -237,7 +237,7 @@ ggplot(df_final, aes(x = "" , y = percentage, fill = fct_inorder(cause_of_death)
 
 ### Día 9: Major/Minor
 
-![Gráfico generado en PowerBI](\external_images\D9.png)
+![Gráfico generado en PowerBI](external_images/D9.png)
 
 **Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
 **Objetivo:**  Mostrar los países con mayor y menor incidencia en muertes debido a neoplasia (cáncer) en 2019 con el fin de reflexionar sobre qué puede llevar a dichos países a alcanzar estas cifras. **Visualización:** **PowerBI**. Se escoge dos visualizaciones de tipo **Tarjeta** para mostrar el país así como la cifra de incidencias por cada 100 mil habitantes.\
