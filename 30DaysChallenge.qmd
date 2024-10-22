@@ -13,10 +13,9 @@ editor: visual
 
 </iframe>
 
-```{=html}
 <script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
-```
+
 **Audiencia:** Grupo de estudiantes de economía\
 **Objetivo:** Mostrar los sectores industriales donde se genera más riqueza con todas las posibilidades de estrategia que ello conlleva, como la inversión o el estudio de un sector u otro.\
 **Visualización:** Herramienta Datawrapper para realizar un gráfico de rosquilla, convirtiendo los valores netos a porcentajes.\
@@ -28,10 +27,9 @@ editor: visual
 
 </iframe>
 
-```{=html}
 <script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
-```
+
 **Audiencia:** Grupo de estudiantes de economía\
 **Objetivo:** Informar sobre quiénes son las personas que dominan el planeta económicamente y las cantidades de sus riquezas.\
 **Visualización:** Herramienta Datawrapper para realizar un gráfico de barras horizontal.\
@@ -48,7 +46,7 @@ editor: visual
 
 ### Día 4: Waffle
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 # Instalar y cargar los paquetes
 library(waffle)
 
@@ -76,7 +74,7 @@ waffle_chart
 
 ### Día 5: Diverging
 
-```{r, fig.width=8, fig.height=20}
+```{r, message = FALSE, warning = FALSE}
 library(ggplot2)
 
 # Datos de ejemplo
@@ -119,7 +117,7 @@ ggplot(data = datos, aes(x = reorder(Country, Inequality.in.income..2021.),
 
 ### Día 7: Hazards
 
-```{python echo = FALSE, message = FALSE, warning = FALSE}
+```{python message = FALSE, warning = FALSE}
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -168,8 +166,7 @@ plt.show()
 
 ### Día 8: Circular
 
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-
+```{r message = FALSE, warning = FALSE}
 library(tidyr)
 library(dplyr)
 library(ggplot2)
@@ -249,14 +246,11 @@ ggplot(df_final, aes(x = "" , y = percentage, fill = fct_inorder(cause_of_death)
 
 </iframe>
 
-```{=html}
 <script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
-```
-```{=html}
 <script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
-```
+
 **Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
 **Objetivo:** Transmitir una visión general de la distribución de afección de la enfermedad con la incidencia más alta de muertes en el planeta.\
 **Visualización:** **Datawrapper**. Así como los mapas físicos muestran con colores las propiedades físicas de un mapa, se utiliza el mismo concepto para mostrar la incidencia de muertes por enfermedades cardiovasculares por país (por cada 100 mil habitantes).\
@@ -268,10 +262,9 @@ ggplot(df_final, aes(x = "" , y = percentage, fill = fct_inorder(cause_of_death)
 
 </iframe>
 
-```{=html}
 <script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
-```
+
 **Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
 **Objetivo:**\
 **Visualización: Datawrapper.** Se usa esta herramienta por tener la opción de embeber de forma interactiva y, además, hacerlo adaptativo para móviles. Para ello, se ha optado por una visualización en tabla con degradado por gravedad de incidencia. Para hacerlo "mobile-friendly" se activan las opciones "Mobile fallback" y "Compact layout". Además, se le da interactividad mediante la activación de búsqueda de países mediante la opción "Make searchable".\
@@ -283,10 +276,9 @@ ggplot(df_final, aes(x = "" , y = percentage, fill = fct_inorder(cause_of_death)
 
 </iframe>
 
-```{=html}
 <script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
-```
+
 **Audiencia:** Grupo de Médicos del Hospital Universitario Puerta del Mar en Cádiz, España\
 **Objetivo:** Reflexionar sobre qué es lo que está ocurriendo en el mundo para que el número de fallecidos mundiales a causa de ciertas enfermedades haya aumentado en las últimas décadas.\
 **Visualización: Datawrapper**. Se usa un gráfico de líneas para visualizar la evolución de las enfermedades. Al usar esta herramienta embebida, se da la posibilidad a la audiencia de revisar los datos de forma interactiva.\
@@ -296,53 +288,292 @@ ggplot(df_final, aes(x = "" , y = percentage, fill = fct_inorder(cause_of_death)
 
 ### Día 13: Family
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{r message = FALSE, warning = FALSE}
+#Se usará la librería igraph
+library(dplyr)
+library(ggplot2)
+
+# Se carga el df
+df <- read.csv('datasets\\used_cars_data.csv')
+
+#Se seleccionan las instancias a graficar
+df1 <- select(df, Year, Fuel_Type, Price)
+
+#Se eliminan valores faltantes
+df1 <- na.omit(df1)
+
+#Se grafica la cantidad de datos existentes según el tipo de Fuel
+library(ggthemes)
+library(patchwork)
+library(scales)
+ggplot(df1, aes(Year, fill = Fuel_Type)) +
+  geom_bar(position = 'fill') + 
+  scale_y_continuous(labels = percent) +
+  theme_solarized() +
+  plot_annotation(title = "¿Qué tipo de coche según el tipo de Fuel predomina más?",
+                  caption = "Cristian Guerrero Balber| Datos: used_cars_data.csv (kaggle)")
+
+```
+
+**Audiencia:** Conferencia sobre Energía sostenible
+
+**Objetivo:** Mostrar la cantidad de instancias por familia de Fuel. Esta visualización quiere mostrar el reflejo de la proporción de coches según el Fuel que existen (ojo, esto puede setar sesgado por la fuente de datos).
+
+**Visualización:** Se utiliza la de la librería *ggplot* de *R*. Se usa la extensión *ggtheme* para darle un aspecto visual atractivo y original. Además, se usa el gráfico de barras apiladas para mostrar la proporción de instancias optimizando la cantidad de código.
+
+**Conjunto de datos:** Se procesan los datos simplemente seleccionando las características a vincular y limpiándo el df resultante de nulos. Fuente: https://www.kaggle.com/datasets/ayushparwal2026/cars-dataset/data
 
 ### Día 14: Heatmap
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{r message = FALSE, warning = FALSE}
+#Se usará la librería ggplot2
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+library(ggthemes)
+
+# Se carga el df
+df <- read.csv('datasets\\used_cars_data.csv')
+
+#Se seleccionan las características a comparar
+df1 <- select(df, Year, Kilometers_Driven, Fuel_Type, Transmission, 
+              Owner_Type, Seats, Price)
+
+#Se realiza una codificación de características no numéricas
+# Supongamos que df es tu dataset y 'columna_categorica' es una columna no numérica
+df1$Fuel_Type <- as.numeric(as.factor(df1$Fuel_Type))
+df1$Transmission <- as.numeric(as.factor(df1$Transmission))
+df1$Owner_Type <- as.numeric(as.factor(df1$Owner_Type))
+
+#Se calcula la matriz de correlaciones
+df_corr <- cor(df1, use = "complete.obs")
+
+#Se convierte la matriz a formato largo
+df_corr <- melt(df_corr)
+
+# Crear el gráfico de la matriz de correlaciones
+ggplot(data = df_corr, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                       limit = c(-1, 1), name = "Coef. de Pearson") +
+  geom_text(aes(label = round(value, 2)),  # Redondear y mostrar los valores
+            color = "black",               # Color del texto
+            size = 4)  +
+  theme_pander() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "¿Qué característica tiene mayor correlación sobre el precio?", 
+       x = "Características", 
+       y = "Características",
+       caption = "Cristian Guerrero Balber| Datos: used_cars_data.csv (kaggle)") +
+  theme(plot.title = element_text(size = 10))
+
+```
+
+**Audiencia:** Conferencia sobre Energía sostenible **Objetivo:** Mostrar las diferentes correlaciones entre distintas características y el precio. Concretamente, y en el tipo de conferencia que es, parece ser que el tipo de fuel y el precio no tiene una correlación lineal demasiado alta, mientras que la característica que tiene una mayor correlación con el precio es el tipo de transmisión. **Visualización:** Se utiliza un *heatmap* de *ggplot2* en *R* **Conjunto de datos:** Se procesan los datos seleccionando las características a correlacionar. Se codifica en forma de número las columnas que no tienen un valor numérico. Luego, se obtiene la matriz de correlaciones y, por último, se grafica. Fuente: https://www.kaggle.com/datasets/ayushparwal2026/cars-dataset/data
 
 ### Día 15: Historical
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{r message = FALSE, warning = FALSE}
+#Se usará la librería igraph
+library(dplyr)
+library(ggplot2)
+
+# Se carga el df
+df <- read.csv('datasets\\used_cars_data.csv')
+
+#Se seleccionan las instancias a graficar
+df1 <- select(df, Year, Fuel_Type, Price)
+
+#Se eliminan valores faltantes
+df1 <- na.omit(df1)
+
+#Se itera entre los distintos tipos de fuel para ver si hay una cantidad
+#suficientemente representativa de cada uno para graficar
+fuel_types <- c(unique(df$Fuel_Type))
+for (fuel_type in fuel_types){
+  df_ <- df1 %>%
+        filter(Fuel_Type == fuel_type) %>%
+        select(Fuel_Type)
+  cat("% de instancias para", fuel_type, ":", 
+      round((nrow(df_) / nrow(df1)) * 100, 2), "%\n")
+}
+
+library(ggthemes)
+library(patchwork)
+#Se filtra solo por los más representativos
+df2 <- df1 %>%
+  filter(Fuel_Type == 'Diesel' | Fuel_Type == 'Petrol')
+
+ggplot(df2, aes(Year, Price, colour = Fuel_Type)) +
+  geom_point() + 
+  stat_smooth(method = 'lm') +
+  scale_x_log10() +
+  scale_y_log10() +
+  theme_solarized(light = FALSE) +
+  labs(title = "¿Qué me costará más, Diesel o Gasolina (Petrol)?",
+       caption = "Cristian Guerrero Balber| Datos: used_cars_data.csv (kaggle)")
+```
+
+**Audiencia:** Conferencia sobre Energía sostenible
+
+**Objetivo:** Mostrar la evolución del precio en los últimos años de los coches de tipo Diesel y Gasolina.
+
+**Visualización:** Se usa *RStudio* con *ggplot*, con un estilo de la extensión *ggthemes*. Además, se visualiza por colores los distintos tipos de Fuel. Se ha usado la transformación logaritmica para minimizar el efecto visual de los outliers.
+
+**Conjunto de datos:** Se procesan los datos seleccionando las características a graficar. Se seleccionan los tipos de fuel más representativos en el dataset. Fuente: https://www.kaggle.com/datasets/ayushparwal2026/cars-dataset/data
 
 ### Día 16: Weather
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{r message = FALSE, warning = FALSE}
+#Se usará la librería igraph
+library(dplyr)
+library(ggplot2)
+
+# Se carga el df
+df <- read.csv('datasets\\2021.Vans_Aggregated.csv')
+
+#Se grafica la cantidad de datos existentes según el tipo de Fuel
+library(ggthemes)
+
+ggplot(df, aes(Fuel.Type, WLTP.CO2.emissions.weighted..g.km., fill = Fuel.Type)) +
+  geom_violin() + 
+  geom_boxplot(width = 0.05) +
+  theme_economist() +
+  scale_fill_discrete(labels = c('Diesel', 'Gasolina', 'Híbrido'),
+                      name = 'Tipo de combustible') +
+  theme(axis.text.x = element_blank(),
+        legend.position = 'right') +
+  labs(y = "Emisiones CO2 emitidas en g/km",
+       title = "¿Qué tipo de coche según el Fuel predomina más?",
+       caption = "Cristian Guerrero Balber| Datos: real-world-vehicle-emissions.csv (kaggle)")
+```
+
+**Audiencia:** Conferencia sobre Energía sostenible
+
+**Objetivo:** Mostrar la gran diferencia de la distribución de emisiones de CO2
+
+**Visualización:** *RStudio* con *ggplot*. Se usa un gráfico de violines junto con boxplots, que muestra no solo la distribución de datos sino la densidad de los mismos por categorías. Se muestra claramente como la distribución de las emisiones de los coches híbridos es, de media, 3 veces más baja que las de diesel y gasolina. Además, la varianza de los datos es menor con cero outliers y bigotes de boxplots muy cortos.
+
+**Conjunto de datos:** No se realiza preprocesado de los datos salvo su carga y su visualización, ya que este tipo de visualización incorpora el propio tratamiento de los datos. Fuente: https://www.kaggle.com/datasets/konradb/real-world-vehicle-emissions
 
 ### Día 17: Networks
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{r message = FALSE, warning = FALSE}
+#Se usará la librería igraph
+library(igraph)
+library(dplyr)
+
+# Se carga el df
+df <- read.csv('datasets\\used_cars_data.csv')
+
+#Se seleccionan las instancias a graficar
+df1 <- select(df, Fuel_Type, Price)
+
+#Se discretiza la columna de precio en cuartiles
+df1 <- df1 %>%
+  mutate(Discreted_price = ntile(Price, 4)) %>%
+  select(-Price) %>% #Se elimina la columna Price
+  mutate(Discreted_price = recode(Discreted_price,
+    "1" = "Bajo",
+    "2" = "Bajo-Medio",
+    "3" = "Medio-Alto",
+    "4" = "Alto"
+  ) )
+
+#Se eliminan duplicados
+df1 <- na.omit(unique(df1))
+
+# Crear el gráfico de red usando igraph
+grafo <- graph_from_data_frame(df1, directed = FALSE)
+
+layout <- layout_with_sugiyama(grafo)
+
+# Configurar los colores de los nodos
+V(grafo)$color <- ifelse(V(grafo)$name %in% 
+c("Bajo", "Bajo-Medio", "Medio-Alto", "Alto"), "salmon", "lightgreen")
+
+# Dibujar el gráfico de la familia
+plot(grafo,
+     layout = layout,
+     vertex.size = 50, 
+     vertex.label.cex = 0.8,
+     vertex.label.color = "black",  # Color del texto
+     vertex.frame.color = NA,  # Sin borde en los nodos
+     main = "Red Familia Precios")
+legend("bottomleft",
+       legend = c("CNG = Compressed Natural Gas",
+                  "LPG = Gas Licuado de Petróleo"),
+       cex = 0.8,
+       bty = 'n')
+
+```
+
+**Audiencia:** Conferencia sobre Energía sostenible
+
+**Objetivo:** Mostrar relaciones en forma de red de precios según el tipo de fuel. Concretamente, concienciar que no existen conexiones entre la energía eléctrica y los coches de precios asequibles según este dataset.
+
+**Visualización:** Se utiliza la de la librería *igraph* de *R* un tipo de gráfico concreto para establecer relaciones en redes. Ideal para mostrar relaciones entre tipo o familias de características.
+
+**Conjunto de datos:** Se procesan los datos seleccionando las características a vincular y limpiándo el df resultante de nulos. Además, se discretiza la columna *Price* para obtener una escala cualitativa del precio y poder relacionarla con el tipo de fuel. Fuente: https://www.kaggle.com/datasets/ayushparwal2026/cars-dataset/data
 
 ### Día 18: Asian Development Bank (data day)
 
-```{r}
+```{r message = FALSE, warning = FALSE}
+#Se usará la librería igraph
+library(dplyr)
 library(ggplot2)
-altura<- c(180, 175, 190, 189, 180, 179, 165, 158, 169, 175, 150, 170, 195)
-peso <- c(80,75,85,90,87,86,65,67,70,54,68,70,90)
-datos <- data.frame(peso <- peso, altura <- altura)
-ggplot(data = datos, aes(x = altura, y = peso, color = "red")) + geom_point() + geom_line()
+library(lubridate)
+library(tvthemes)
+
+# Se carga el df
+df <- read.csv('datasets\\ADB Climate Change Financing - 2023-based on commitments.csv')
+
+#Se transforma la columna de fecha de texto a fecha, y se limpia el df de nulos
+df1 <- df %>%
+  select(Date.Signed, Sector, Signed.amount....million.) %>%
+  mutate(Signed.amount = suppressWarnings(as.numeric(Signed.amount....million.))) %>%
+  select(-Signed.amount....million.)%>%
+  mutate(Date.Signed = parse_date_time(Date.Signed, orders = 'd-b-y')) %>%
+  mutate(Date.Signed = as.Date(Date.Signed))%>%
+  arrange(Date.Signed) %>%
+  na.omit()
+
+#Se cambia la fecha a semanas
+df1 <- df1 %>%
+  mutate(Week.Signed = floor_date(Date.Signed, "week"))%>%
+  group_by(Week.Signed, Sector) %>%
+  summarise(Signed.amount = sum(Signed.amount)) %>%
+  ungroup()
+
+#Se calcula el acumulado por semana y sector
+df1 <- df1 %>%
+  group_by(Sector) %>%                         
+  mutate(Signed.amount.cumsum = cumsum(Signed.amount)) %>%  
+  ungroup()
+
+#Se grafica la cantidad de datos existentes según el tipo de Fuel
+library(ggthemes)
+ggplot(df1, aes(Week.Signed, Signed.amount.cumsum, fill = Sector))+
+  geom_area(alpha = 0.8, colour = 'darkblue') +
+  theme_simpsons(title.font = "Lucida Sans Unicode",
+                 text.font = "Akbar")+
+  scale_x_date(breaks = seq(min(df1$Week.Signed), max(df1$Week.Signed), "1 month"),
+               date_labels = "%b")+
+  scale_y_continuous(labels = scales::dollar)+
+  scale_fill_simpsons() +
+  labs(y = "Acumulador en millones de $ americanos",
+       x = "2023",
+       title = "¿Qué sector está marcando la diferencia en la lucha contra el cambio climático?",
+       caption = "Cristian Guerrero Balber| Datos: used_cars_data.csv (kaggle)")
 ```
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+**Audiencia:** Conferencia sobre Energía sostenible
+
+**Objetivo:** Mostrar las principales áreas económicas que aportan financiación en la lucha contra el cambio climático según un acuerdo firmado en 2015 por la Asian Development Bank (ADB).
+
+**Visualización:** Se usa *RStudio* con *ggplot*. Se importa un estilo muy original de películas, en este caso, de los simpson, para mostrar unas áreas apiladas por sector de la aportación en dólares americanos.
+
+**Conjunto de datos:** Se preprocesan los datos limpiando de nulos, agrupando por fechas y sectores, así como calculando los acumulados aportados por sector y fecha. Fuente: https://data.adb.org/dataset/climate-change-financing-adb
 
 ## Categoría: "Timeseries"
 
@@ -432,15 +663,12 @@ ggplot(data = datos, aes(x = altura, y = peso, color = "red")) + geom_point() + 
 **Visualización:**\
 **Conjunto de datos:**
 
-```{=html}
 <script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
-```
+
 <iframe title="Net Worth (in billions) by Industry" aria-label="Bar Chart" id="datawrapper-chart-SpQmI" src="https://datawrapper.dwcdn.net/SpQmI/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="395" data-external="1">
 
 </iframe>
 
-```{=html}
 <script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
-```
