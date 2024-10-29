@@ -1,9 +1,22 @@
 ---
 title: "30DaysChanllenge"
 author: "Cristian Guerrero Balber"
-format: html
 editor: visual
+format:
+  html:
+    css: styles.css
 ---
+
+```{r setup, include=FALSE}
+library(reticulate)
+use_python("C:/Users/Cristian/AppData/Local/Programs/Python/Python312/python.exe", required = TRUE)
+# Establecer opciones globales para todos los gráficos
+knitr::opts_chunk$set(
+  fig.width = 10,  # Ancho de la figura en pulgadas
+  fig.height = 10,  # Altura de la figura en pulgadas
+  fig.align = 'center'  # Centrar las figuras
+)
+```
 
 ## Categoría: "Comparisons"
 
@@ -74,7 +87,7 @@ waffle_chart
 
 ### Día 5: Diverging
 
-```{r, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE, fig.width = 10, fig.height = 20}
 library(ggplot2)
 
 # Datos de ejemplo
@@ -579,38 +592,433 @@ ggplot(df1, aes(Week.Signed, Signed.amount.cumsum, fill = Sector))+
 
 ### Día 19: Dinosaurs
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{python message = FALSE, fig.width = 20, fig.height = 10}
+import pandas as pd
+from pathlib import Path
+
+ruta = "datasets//dinosaurs.csv"
+dataset = pd.read_csv(ruta)
+#Se muestra info de la tabla
+print(dataset.info())
+#Existen variables como lived_in, length y species con nulos. Como se va a usar lengh para graficar, se eliminan los nulos
+dataset = dataset.dropna(axis = 0)
+#Se analizan los diferentes tipos de dinosaurios según su dieta
+print(f"Tipos de dinosaurios según su dieta:")
+dataset['diet'].unique()
+#El resultado 'herbivorous/omnivorous' parece una incongruencia, ya que si es onminoro entonces es herbivoro y carnivoro. Veamos cuantos registros hay.
+print(f"\nDinosaurios de tipo herbivorous/omnivorous:")
+dataset[dataset['diet'] == 'herbivorous/omnivorous']
+#Además, veamos los unknown
+#Como hay pocos registros, se eliminan
+dataset = dataset[(dataset['diet']!='herbivorous/omnivorous')&(dataset['diet']!='unknown')]
+#Se verifica el resultado
+dataset['diet'].unique()
+#Por inspección visual de la columna "period", se comprueba que tiene casi siempre la misma estructura
+dataset['period'].head()
+#La estructura: premura del periodo + periodo + rango(x-y) + "million years ago". Se crea una función para descomponerla y obtener los años de comienzo y fin del periodo
+# ¿Son todas así?
+dataset['split_parts'] = dataset['period'].apply(lambda x: x.split())
+dataset['count_splits'] = dataset['split_parts'].apply(lambda x: len(x))
+dataset[dataset['count_splits'] < 6]
+#Se filtra solo por los registros con 6 elementos después del split (sigue la estructura tipo)
+dataset = dataset[dataset['count_splits'] == 6]
+#Se crean las columnas de forma adecuada
+dataset['stage'] = dataset['split_parts'].apply(lambda x: x[0])
+dataset['period_name'] = dataset['split_parts'].apply(lambda x: x[1])
+dataset['range_period'] = dataset['split_parts'].apply(lambda x: x[2])
+#Ahora, del range_period, hay que crear el periodo de comienzo y fin, pero hay que comprobar que sigue este formato
+print("¿Existe algún registro de rango de período que no contenga el separador '-'?")
+print(dataset[~dataset['range_period'].str.contains('-')].shape)
+#Existen registros sin fecha fin de periodo. Se eliminan estas entradas por estandarizar, ya que aun tenemos bastantes registros para graficar
+dataset = dataset[dataset['range_period'].str.contains('-')]
+#Se crean las columnas start_period y end_period
+dataset['start_period'] = dataset['split_parts'].apply(lambda x: int(x[2].split("-")[0]))
+dataset['end_period'] = dataset['split_parts'].apply(lambda x: int(x[2].split("-")[1]))
+#Por último, la columna de "length" se va a cambiar a numérico
+dataset['length'] = dataset['length'].apply(lambda x: float(x.replace("m", "")))
+#Se ordena por length
+dataset = dataset.sort_values(by = 'length', ascending = False)
+
+#Se va a guardar el dataset para usarse en otro apartado
+dataset.to_csv("datasets\\dinosaurs_mod.csv", index = False)
+
+#Se definen los rangos de los periodos
+start_periods = dataset.groupby('period_name')['start_period'].max()
+end_periods = dataset.groupby('period_name')['start_period'].min()
+print("Rangos de los períodos:")
+print(start_periods)
+print(end_periods)
+#Como estos períodos deberían ser secuenciales, se va a calcular el punto medio entre periodos solapados para marcar la frontera
+mean_point = int((end_periods['Triassic'] + start_periods['Jurassic']) / 2)
+end_periods['Triassic'] = mean_point
+start_periods['Jurassic'] = mean_point
+mean_point = int((end_periods['Jurassic'] + start_periods['Cretaceous']) / 2)
+end_periods['Jurassic'] = mean_point
+start_periods['Cretaceous'] = mean_point
+print("Rangos de los períodos tras procesarlos:")
+print(start_periods)
+print(end_periods)
+
+#Ahora se van a graficar los 5 dinosaurios más grandes de cada tipo según su dieta
+import warnings
+warnings.filterwarnings('ignore')
+import plotly.graph_objects as go
+
+def create_dinosaur_plot():
+  global dataset_filtered
+  global start_periods
+  global end_periods
+  
+  # Crear la figura
+  fig = go.Figure()
+  
+  #Colores de lineas por dieta
+  colors_diet = {
+      'carnivorous': 'rgba(255, 0, 0, 0.5)', # Rojo con 50% de transparencia
+      'herbivorous': 'rgba(0, 255, 0, 0.5)', # Verde con 50% de transparencia
+      'omnivorous': 'rgba(0, 0, 255, 0.5)',  # Azul con 50% de transparencia
+  
+  }
+  
+  dataset_filtered = pd.concat([dataset[dataset['diet'] == 'carnivorous'].head(5),
+                                  dataset[dataset['diet'] == 'herbivorous'].head(5),
+                                  dataset[dataset['diet'] == 'omnivorous'].head(5)], axis = 0)
+  dataset_filtered = dataset_filtered.sort_values(by = 'length', ascending = True)
+  
+  # Agregar las líneas horizontales (conexión entre puntos) 
+  for i, row in dataset_filtered.iterrows():
+      category = row[1]
+      color = colors_diet[category]
+      fig.add_trace(go.Scatter(
+          x=[-row[15], -row[16]],  # Coordenadas x para cada grupo (inicio, fin)
+          y=[row[5], row[5]],  # Coordenadas y (mismo valor para conectar)
+          mode='lines',
+          line=dict(color=color, width=8),
+          showlegend = False
+      ))
+  
+      # Agregar puntos para la primera categoría (Inicio)
+      fig.add_trace(go.Scatter(
+          x=[-row[15]],
+          y=[row[5]],
+          text = [row[0]],
+          textposition = 'top center',
+          textfont = dict(family = 'Arial Bold'),
+          mode='markers+text',
+          name='Inicio Período',
+          marker=dict(color=color, size=10),
+          showlegend = False
+      ))
+  
+      # Agregar puntos para la segunda categoría (Fin)
+      fig.add_trace(go.Scatter(
+          x=[-row[16]],
+          y=[row[5]],
+          mode='markers',
+          name='Fin Período',
+          marker=dict(color=color, size=10),
+          showlegend = False
+      ))
+  
+  #Agregar un rectánculo para cada períodos
+  colors_period = {
+      'Cretaceous': 'rgb(165, 70, 87)',
+      'Jurassic': 'rgb(76, 106, 146)',
+      'Triassic': 'rgb(53, 94, 59)'
+  }
+  for period in start_periods.index:
+      fig.add_shape(
+          type = "rect",
+          x0 = -start_periods[period], x1 = -end_periods[period],
+          y0 = min(dataset_filtered['length']) - 5,
+          y1 = max(dataset_filtered['length']) + 5,
+          fillcolor = colors_period[period],
+          opacity = 0.3,
+          layer = "below",
+          line = dict(color = 'black', width = 3)
+      )
+  
+  # Agregar texto a los rectángulos
+      fig.add_annotation(
+          x=(-start_periods[period] + -end_periods[period]) / 2,  # Centro en el eje x
+          y=max(dataset_filtered['length']) + 4,  # Top en el eje y
+          text=period,
+          showarrow=False,
+          font=dict(size=16, color=colors_period[period]),  # Propiedades de la fuente
+          align='center'  # Alineación del texto
+      )
+  
+  # Agregar un trace para cada categoría en la leyenda
+  for categoria, color in colors_diet.items():
+      fig.add_trace(go.Scatter(
+          x=[None],  # No hay coordenadas, solo se usa para la leyenda
+          y=[None],
+          mode='lines',
+          line=dict(color=color, width=4),  # Color correspondiente
+          name=categoria,  # Nombre que aparecerá en la leyenda
+          showlegend=True  # Este trace aparecerá en la leyenda
+      ))
+  
+  # Configurar el layout
+  fig.update_layout(
+      title={
+        'text': '¿En qué período vivieron los dinosaurios más grandes que hayan pisado la faz de la Tierra?',
+        'font': {
+          'size': 15
+          }
+        },
+      xaxis_title='Millones de años atrás...',
+      yaxis_title='Metros de Altura',
+      width = 920,
+      height = 700
+  )
+  
+  # Mostrar la gráfica
+  #fig.show()
+  return fig
+
+fig = create_dinosaur_plot()
+fig.show()
+```
+
+**Audiencia:** Paleontólogos\
+**Objetivo:** Mostrar de forma clara los dinosaurios más grandes que han vivido en la tierra divididos por tipo de dieta (carnívoros, herbívoros y omnívoros) así como el período en el que existieron (triásico, jurásico y cetácico).\
+**Visualización:** Se usa la librería **Plotly** de **Python**. El tipo de gráfica escogida es una ***dumbbell plot.*** Se ha mostrado en sus ejes los metros de altura del dinosaurio contra los millones de años atrás en los que vivio. Cada dumbbell representa una franja de tiempo. Además, se ha dividido cada período por colores y se ha añadido una leyenda por color según el tipo de dieta del dinosaurio. Por último, se ha añadido el nombre del dinosaurio sobre su primer punto. De esta manera, se ha conseguido representar claramente hasta 5 dimensiones en un solo gráfico 2D.\
+**Conjunto de datos:** Ha sido necesario un prepreocesamiento moderado debido a que los datos de partida no tenian el formato adecuado (tratamiento de textos y números). Además, se ha tenido que modificar información sobre los comienzos de inicio y fin de períodos para que fuera coherente en el gráfico, por lo que esto ha podido alterar la veracidad e integridad de los mismos. Fuente:[https://www.kaggle.com/datasets/kjanjua/jurassic-park-the-exhaustive-dinosaur-dataset](#0){.uri}
 
 ### Día 20: Correlation
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{python message = FALSE, fig.width = 10, fig.height = 10}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+ruta = "datasets/dinosaurs_mod.csv"
+dataset = pd.read_csv(ruta)
+dataset.columns
+dataset.drop(['name', 'period', 'type', 'lived_in', 'taxonomy', 'named_by', 'species', 'link', 'split_parts', 'count_splits', 'stage', 'range_period', 'start_period', 'end_period'], axis = 1, inplace = True)
+#Se discretiza la longitud de los dinosaurios según sus cuartiles
+dataset['length'] = pd.qcut(dataset['length'], q = 4, labels=['Pequeños', 'Medianos', 'Grandes', 'Muy grandes'])
+agg = dataset.groupby(['diet', 'length']).size().reset_index(name = 'count')
+
+def plotear_relacion():
+  global agg
+  # Mapear etiquetas a índices
+  all_labels = pd.concat([agg['diet'], agg['length']]).unique()
+  label_to_index = {label: index for index, label in enumerate(all_labels)}
+  # Crear listas para los nodos y los enlaces
+  source = agg['diet'].map(label_to_index).tolist()  # Dietas
+  target = agg['length'].map(label_to_index).tolist()  # Longitudes
+  values = agg['count'].tolist()  # Conteos
+
+  # Asignar colores a cada tipo de dieta
+  diet_colors = {
+      'carnivorous': 'rgba(255, 0, 0, 0.8)',  # Rojo para carnívoros
+      'herbivorous': 'rgba(0, 255, 0, 0.8)',   # Verde para herbívoros
+      'omnivorous': 'rgba(0, 0, 255, 0.8)'      # Azul para omnívoros
+  }
+
+  # Crear una lista de colores para cada enlace basado en la dieta
+  link_colors = [diet_colors[diet] for diet in agg['diet']]
+
+  # Crear el diagrama de Sankey
+  fig = go.Figure(go.Sankey(
+      node=dict(
+          pad=15,
+          thickness=20,
+          line=dict(color='black', width=0.5),
+          label=all_labels,
+          color='blue'  # Color de los nodos
+      ),
+      link=dict(
+          source=source,  # Índices de los nodos de origen
+          target=target,  # Índices de los nodos de destino
+          value=values,   # Valores de los enlaces
+          color=link_colors  # Colores de los enlaces según dieta
+      )
+  ))
+
+  # Configurar el layout
+  fig.update_layout(
+  title={
+        'text': '¿Qué correlación existe entre el tamaño y la dieta?',
+        'font': {
+          'size': 15,
+          'family': 'monospace'
+          }})
+
+  return fig
+
+#Llamar a la función
+relacion = plotear_relacion()
+
+# Mostrar el diagrama
+relacion.show()
+```
+
+**Audiencia:** Paleontólogos\
+**Objetivo:** Correlacionar la proporcionalidad existente entre el tipo de dieta del dinosaurio y su tamaño.\
+**Visualización:** Se usa la librería **Plotly** de **Python**. El tipo de gráfica escogida es una ***Sankey,*** correlacionando la cantidad de dinosaurios entre las categorías relacionadas por la anchura de las lineas conectoras y su color.\
+**Conjunto de datos:** Se ha necesitado realizar una discretización de los tamaños de los dinosaurios por sus cuartiles, luego una agregación de las columnas de interés y por último una creación de listas de etiquetas de "fuentes" y "objetivos" para crear la gráfica. Fuente:[https://www.kaggle.com/datasets/kjanjua/jurassic-park-the-exhaustive-dinosaur-dataset](#0){.uri}
 
 ### Día 21: Green Energy
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{python message = FALSE, warning = FALSE, fig.width = 10, fig.height = 10}
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+#Añado estilo preestablecido de plt
+plt.style.use('dark_background')
+ruta = "datasets/intermittent-renewables-production-france.csv"
+df = pd.read_csv(ruta)
+print(df.info())
+
+#Solo hay dos instancias con nulos, se eliminan
+df = df.dropna()
+
+#Se realiza una agregación de la media por mes
+df_grouped = df.groupby("monthName")['Production'].mean().reset_index()
+
+# Ordenar los datos por el orden de los meses
+month_order = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+df_grouped["monthName"] = pd.Categorical(df_grouped["monthName"], categories=month_order, ordered=True)
+df_grouped = df_grouped.sort_values("monthName")
+
+# Convertir los meses a ángulos para el gráfico polar
+angles = np.linspace(0, 2 * np.pi, len(df_grouped), endpoint=False).tolist()
+angles += angles[:1]  # Repetir el primer ángulo para cerrar el ciclo
+values = df_grouped["Production"].tolist()
+values += values[:1]  # Repetir el primer valor para cerrar el ciclo
+
+# Configurar el gráfico polar
+fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+ax.plot(angles, values, linewidth=2, color = 'green', linestyle='solid')
+ax.fill(angles, values, color = 'green', alpha=0.3)
+
+# Ajustar etiquetas
+ax.set_xticks(angles[:-1]) # Usar todos los ángulos excepto el último para evitar duplicados en las etiquetas
+ax.set_xticklabels(df_grouped["monthName"])
+
+# Configurar la cuadrícula
+ax.grid(color='green', linestyle='--', linewidth=0.7, alpha=0.7)  # Personaliza el color aquí
+
+# Título y mostrar el gráfico
+ax.set_title("Producción Media de Energía Verde Mensual 2020-2023", va='bottom')
+plt.show()
+```
+
+**Audiencia:** Skateholders de empresas manufactureras de vehículos eléctricos\
+**Objetivo:** Mostrar a inversores del sector eléctrico como se comporta la producción de energía verde para sus vehículos según el mes del año.\
+**Visualización:** Se usa **Matplotlib** de **Python**. El tipo de visualización es **poligonal** con un **grid polar.**\
+**Conjunto de datos:** Se crea una agrupación según el mes y se calcula la media de la producción. Tras esto, se sigue procesando ordenando según el mes y realizando diferentes transformaciones para adaptar los datos resultantes al tipo de gráfico que se busca.Fuente:<https://www.kaggle.com/datasets/henriupton/wind-solar-electricity-production>
 
 ### Día 22: Mobility
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{python message = FALSE, warning = FALSE, fig.width = 10, fig.height = 10}
+import pandas as pd
+import matplotlib.pyplot as plt
+
+#Se reestablece el estilo
+plt.style.use('default')
+
+#Se carga el archivo
+ruta = "datasets/intermittent-renewables-production-france.csv"
+df = pd.read_csv(ruta)
+
+#Solo hay dos instancias con nulos, se eliminan
+df = df.dropna()
+
+#Se ordena por la columna dayOfYear
+df = df.sort_values(by = 'dayOfYear', ascending = True)
+
+#Se transforma Date en fecha
+df['Date'] = pd.to_datetime(df['Date'], format = "%Y-%m-%d")
+
+#Se extrae el año
+df['Year'] = df['Date'].dt.year
+
+#Se realiza una agrupación y se calcula la media de la producción
+df = df.groupby(['Source', 'dayOfYear', 'Year'])['Production'].mean().reset_index()
+
+#Se crea una función para generar el plot
+def create_plot():
+  global df
+  import seaborn as sns
+  sns.set_theme(style="ticks")
+  
+  g = sns.relplot(x='dayOfYear', y='Production', hue = 'Source', size='Production',
+              sizes=(40, 400), alpha=.5, palette=['salmon', 'blue'],
+              height=6, col = 'Year', col_wrap = 2, data=df)
+  g.set_axis_labels("Día del Año", "Producción de Energía (MWh)")
+  g.fig.suptitle("Producción media de Energía a lo largo del año", y = 1.05)
+  plt.show()
+
+create_plot()
+
+
+
+```
+
+**Audiencia:** Skateholders de empresas manufactureras de vehículos eléctricos\
+**Objetivo:** Mostrar a los principales skateholders cuál es la mejor fuente de energía verde para mostrar la viabilidad de su negocio sin depender de combustibles fósiles dependiendo del momento del año.\
+**Visualización:** Se utiliza la librería Seaborn de Python junto con Matplotlib. El tipo de gráfico es de dispersión aprovechando las ventajas de la función relplot de Seaborn, que permite utilizar un FaceGrid muy cómodamente, además de agregar leyendas. En los distintos años, se observa una distribución de creación de energía similar, comprobando como la energía solar se equipara un poco más con la eólica a mitad de año. Sin embargo, en el resto de las épocas del año, la energía eólica es superior en la producción de energía.\
+**Conjunto de datos:** Se realiza un preprocesado transformando la columna de fecha en tipo de formato fecha y así poder extraer el mes, ya que no se tenía antes. A partir de aquí, se puede realizar una agregación múltiple incluyendo el mes, el cual será usado para crear el grid.Fuente:<https://www.kaggle.com/datasets/henriupton/wind-solar-electricity-production>
 
 ### Día 23: Tiles
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{python message = FALSE, warning = FALSE, fig.width = 12, fig.height = 12}
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+#Se reestablece el estilo
+plt.style.use('default')
+
+#Se carga el dataframe
+ruta = "datasets/intermittent-renewables-production-france.csv"
+df = pd.read_csv(ruta)
+
+#Solo hay dos instancias con nulos, se eliminan
+df = df.dropna()
+
+#Se ordena por la columna dayOfYear
+df = df.sort_values(by = 'dayOfYear', ascending = True)
+
+#Se transforma Date en fecha
+df['Date'] = pd.to_datetime(df['Date'], format = "%Y-%m-%d")
+
+#Se extrae el año
+df['Year'] = df['Date'].dt.year
+
+#Se realiza la agrupación por año y mes
+df = df.groupby(['Year', 'monthName'])['Production'].mean().reset_index()
+
+# Ordenar los datos por el orden de los meses
+month_order = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+df["monthName"] = pd.Categorical(df["monthName"], categories=month_order, ordered=True)
+df = df.sort_values("monthName")
+
+#Se pivota para crear una tabla donde se crucen las columnas con sus valores
+df = df.pivot(index = 'monthName', columns = 'Year', values = 'Production')
+
+plt.figure()
+#Se crea un heatmap
+ax = sns.heatmap(df, annot = True, linewidths = .5, cmap = 'coolwarm')
+# Configurar los nombres de los ejes
+ax.set_xlabel('Años')  
+ax.set_ylabel('Meses')
+# Se añade un título
+ax.set_title("¿Cuándo se ha producido más energía verde en los últimos años?", fontsize=10, fontweight='bold', color='darkblue')
+
+plt.show()
+
+```
+
+**Audiencia:** Skateholders de empresas manufactureras de vehículos eléctricos\
+**Objetivo:** Mostrar a los principales skateholders cuáles han sido los mejores meses de los últimos años en la generación de energía a través de métodos sostenibles.\
+**Visualización:** Se ha escogido un heatmap de Seaborn de Python. De esta manera, se puede comprobar cuáles han sido los mejores meses de los últimos años en cuanto a la producción energética verde.\
+**Conjunto de datos:** Se realiza un preprocesado transformando la columna de fecha en tipo de formato fecha y así poder extraer el mes. A partir de aquí, se puede realizar una agregación múltiple incluyendo el mes, el cual será usado para crear el grid. Además, para preparar los datos para este tipo de gráfica, se pivota sobre las columnas de mes y año.Fuente:[https://www.kaggle.com/datasets/henriupton/wind-solar-electricity-production](#0)
 
 ### Día 24: ILO Region for Africa (data day)
 

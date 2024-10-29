@@ -1,32 +1,53 @@
 #Se usará la librería igraph
 library(dplyr)
 library(ggplot2)
+library(lubridate)
+library(tvthemes)
+library(extrafont)
+
 
 # Se carga el df
-df <- read.csv('datasets\\used_cars_data.csv')
+df <- read.csv('datasets\\ADB Climate Change Financing - 2023-based on commitments.csv')
 
-#Se seleccionan las instancias a graficar
-df1 <- select(df, Year, Fuel_Type, Price)
+#Se transforma la columna de fecha de texto a fecha, y se limpia el df de nulos
+df1 <- df %>%
+  select(Date.Signed, Sector, Signed.amount....million.) %>%
+  mutate(Signed.amount = suppressWarnings(as.numeric(Signed.amount....million.))) %>%
+  select(-Signed.amount....million.)%>%
+  mutate(Date.Signed = parse_date_time(Date.Signed, orders = 'd-b-y')) %>%
+  mutate(Date.Signed = as.Date(Date.Signed))%>%
+  arrange(Date.Signed) %>%
+  na.omit()
 
+#Se cambia la fecha a semanas
+df1 <- df1 %>%
+  mutate(Week.Signed = floor_date(Date.Signed, "week"))%>%
+  group_by(Week.Signed, Sector) %>%
+  summarise(Signed.amount = sum(Signed.amount)) %>%
+  ungroup()
 
-#Se eliminan valores faltantes
-df1 <- na.omit(df1)
-View(df1)
-#Se itera entre los distintos tipos de fuel para ver si hay una cantidad
-#suficientemente representativa de cada uno para graficar
-fuel_types <- c(unique(df$Fuel_Type))
-ctd_datos <- c()
-for (fuel_type in fuel_types){
-  df_ <- df1 %>%
-    filter(Fuel_Type == fuel_type) %>%
-    select(Fuel_Type)
-  ctd_datos <- append(ctd_datos, nrow(df_))
-}
-fuel_types
+#Se calcula el acumulado por semana y sector
+df1 <- df1 %>%
+  group_by(Sector) %>%                         
+  mutate(Signed.amount.cumsum = cumsum(Signed.amount)) %>%  
+  ungroup()
 
-ctd_datos
-df_to_plot <- data.frame(fuel_types, ctd_datos)
+#Se grafica la cantidad de datos existentes según el tipo de Fuel
+library(ggthemes)
+ggplot(df1, aes(Week.Signed, Signed.amount.cumsum, fill = Sector))+
+  geom_area(alpha = 0.8, colour = 'darkblue') +
+  theme_simpsons(title.font = "Lucida Sans Unicode",
+                 text.font = "Akbar")+
+  scale_x_date(breaks = seq(min(df1$Week.Signed), max(df1$Week.Signed), "1 month"),
+               date_labels = "%b")+
+  scale_y_continuous(labels = scales::dollar)+
+  scale_fill_simpsons() +
+  labs(y = "Acumulador en millones de $ americanos",
+       x = "2023",
+       title = "¿Qué sector está marcando la diferencia en la lucha contra el cambio climático?",
+       caption = "Cristian Guerrero Balber| Datos: used_cars_data.csv (kaggle)")
 
-View(df_to_plot)
-ggplot(x = fuel_types,y = ctd_datos) 
-
+library(reticulate)
+# Usar la versión de Python en tu máquina
+use_python("C:/Users/Cristian/AppData/Local/Programs/Python/Python312/python.exe", required = TRUE)
+py_config()
