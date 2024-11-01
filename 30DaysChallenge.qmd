@@ -5,6 +5,7 @@ editor: visual
 format:
   html:
     css: styles.css
+    embed-resources: true
 ---
 
 ```{r setup, include=FALSE}
@@ -1022,61 +1023,603 @@ plt.show()
 
 ### Día 24: ILO Region for Africa (data day)
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{python message = FALSE, warning = FALSE, fig.asp = 1.5}
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+#Se reestablece el estilo
+plt.style.use('default')
+
+#Se carga el dataframe
+ruta = "datasets/SDG_0852_SEX_AGE_RT_A-filtered-2024-10-30.csv"
+df = pd.read_csv(ruta)
+
+#Se revisan las primeras filas del archivo
+df.head()
+
+#Se filtra por las columnas de interés
+df = df[['ref_area.label', 'sex.label', 'classif1.label','time', 'obs_value']]
+
+#Se filtra por sexo = total y mayores de 25 años
+df = df[(df['sex.label'] == 'Sex: Total') & (df['classif1.label'] == 'Age (Youth, adults): 25+')]
+
+#Se elimina la columna sex.label, ya no es necesaria
+df.drop(['sex.label', 'classif1.label'], axis = 1, inplace = True)
+
+#Se revisan los paises en ref_area.label, ya que se quiere mostrar por separado y no agrupaciones
+print(df['ref_area.label'].unique())
+
+'''
+Se observa que en esta lista no solo hay países, sino también regiones clasificadas por ingresos (World: Low Income, 
+Africa: Lower-middle income...), regiones globales y continentes (World, Africa, Americas...), grupos de países y
+organizaciones (European Union 28. G20, ASEAN...), otros grupos de exclusión (World excluding India and China...) y 
+territorios y áreas especiales (Bermuda, Cook Islands, Hong Kong, China...). Por lo tanto, como se quiere analizar 
+púramente paises, se procede a filtrar para excluir a todos estos grupos.
+'''
+exclusion_list = [
+    "World", "Africa", "Americas", "Arab States", "Asia and the Pacific", "Europe and Central Asia",
+    "Latin America and the Caribbean", "Northern America", "Eastern Asia", "South-Eastern Asia",
+    "South-Eastern Asia and the Pacific", "Southern Asia", "Northern, Southern and Western Europe",
+    "Northern Europe", "Southern Europe", "Western Europe", "Eastern Europe", "Central Asia",
+    "Central and Western Asia", "Western Asia", "Pacific Islands", "Caribbean", "Central America",
+    "South America", "Northern Africa", "Sub-Saharan Africa", "Central Africa", "Eastern Africa",
+    "Southern Africa", "Western Africa", "European Union 28", "European Union 27", "G20", "G7",
+    "ASEAN", "BRICS", "World excluding BRICS", "APEC", "Arab League", "CARICOM", "MENA",
+    "World excluding India and China", "World: Lower-middle income excluding India",
+    "World: Upper-middle income excluding China", "Bermuda", "Cook Islands", "Curaçao", "Cayman Islands",
+    "Falkland Islands, Malvinas", "Hong Kong, China", "Macao, China", "Montserrat", "New Caledonia",
+    "Niue", "Occupied Palestinian Territory", "Réunion", "Tokelau", "Taiwan, China", "Wallis and Futuna",
+    "South Africa"
+]
+
+
+# Filtrar el DataFrame excluyendo los elementos de la lista y aquellos que contienen ":"
+df = df[~df['ref_area.label'].isin(exclusion_list) & ~df['ref_area.label'].str.contains(":")]
+#df = df[(~df['ref_area.label'].str.contains(":")) & (~df['ref_area.label'].str.contains("world", case = False))]
+
+#Comprobemos ahora el mínimo y máximo de los años de registros
+print(f'Mínimo año: {df['time'].min()}')
+print(f'Máximo año: {df['time'].max()}')
+
+#Se almacenan en variables pero se reduce el rango para que no se estudien los extremos. Esto se hace para no reducir demasiado el df.
+min_anio = df['time'].min() + 1
+max_anio = df['time'].max() - 1
+
+#Se filtra de forma que solo se tengan estos dos valores
+df = df[(df['time'] == min_anio) | (df['time'] == max_anio)]
+
+#Se eliminan los paises que no tengan ambos años registrados
+country_list = set(df['ref_area.label'].tolist())
+ind_to_drop = []
+for country in country_list:
+    filter = df['ref_area.label'] == country
+    df_ = df[filter]
+    if min_anio not in df_['time'].values or max_anio not in df_['time'].values:
+        ind_to_drop += df[filter].index.to_list()
+df.drop(ind_to_drop, axis = 0, inplace = True)
+#Se visualiza la cantidad de países restantes
+print(f'Cantidad de países a mostrar: {df.shape[0]}')
+
+#Se pivota sobre el año para facilitar la codificación de la visualización y realizar algún cambio adicional
+df = df.pivot(index = 'ref_area.label', columns = 'time', values = 'obs_value').reset_index()
+
+#Se visualiza la nueva forma de la tabla
+print(df.head())
+
+#Se va a calcular la diferencia entre 2014 y 2024 para ver qué países han sido críticos en el cambio
+df['diff'] = round(df[max_anio] - df[min_anio], 2)
+
+#Se ordena según el valor absoluto de la diferencia
+df = df.sort_values(by = 'diff', key = lambda x: x.abs(), ascending = False)
+
+#Se actualiza la lista de países ordenados según el valor del último año (por motivos de posicion de anotaciones en graficación)
+country_list = set(df.sort_values(by = 'diff')['ref_area.label'].to_list())
+
+offset = 5 # para evitar superposiciones en las anotaciones
+#Se grafica el slope chart
+fig, ax = plt.subplots(figsize = (8, 10))
+annotations = []
+for country in country_list:
+    y1 = df[min_anio][df['ref_area.label'] == country].values[0]
+    y2 = df[max_anio][df['ref_area.label'] == country].values[0]
+    if country in df['ref_area.label'].head(10).values:
+        diff = df['diff'][df['ref_area.label'] == country].values[0]
+        #Anotaciones para indicar la diferencia y el país
+        offset *= -1 # se va alternando hacia donde se mueve el texto verticalmente
+        ann = ax.annotate(f'{country}: {diff} %',
+                    (1, y2),
+                    textcoords = 'offset points',
+                    xytext = (15, 0),
+                    ha = 'left',
+                    fontsize = 7,
+                    fontfamily = 'monospace',
+                    color = 'black',
+                    arrowprops = dict(
+                        arrowstyle = '->',
+                        color = 'black'
+                    ))
+        annotations.append(ann)
+        if diff > 0:
+            params = {
+                'color': 'red',
+                'alpha': 0.7,
+                'marker': 'o',
+                'linewidth': 3,
+            }
+        else:
+            params = {
+                'color': 'green',
+                'alpha': 0.7,
+                'marker': 'o',
+                'linewidth': 3,
+            }
+            if diff == df.head(1)['diff'].values[0]:
+                params['color'] = 'darkblue'
+            
+    else:
+        params = {
+                'color': 'grey',
+                'alpha': 0.1
+            }
+    plt.plot([0, 1], [y1, y2], **params)
+#Se comprueba que no hayan anotaciones pisándose
+changed = []
+for i, ann1 in enumerate(annotations):
+    pos_1 = ann1.xy
+    if ann1.get_text() not in changed: #Solo sigue si no se ha movido este annotation ya
+        for j, ann2 in enumerate(annotations):
+            if i != j: # Evitar cruzamientos consigo mismo
+                pos_2 = ann2.xy
+                diff_y = abs(pos_1[1] - pos_2[1])
+                if diff_y < 0.5:
+                    newPosition = (pos_2[0] + 20, pos_2[1] - 12)
+                    ann2.set_position(newPosition)
+                    #Se a la lista de cambiados, para que no se vuelva a mover ni este ni su "pareja"
+                    changed.append(ann2.get_text())
+
+
+#Anotaciones explicativas
+text = f"""Top 10 países con la mayor variación
+de tasa de desempleo entre {min_anio} y {max_anio}. 
+{df.head(1)['ref_area.label'].values[0]} marca la diferencia con una variación
+de un {df.head(1)['diff'].values[0]}%"""
+
+
+text_params = {
+    'color': 'black',
+    'ha': 'left',
+    'va': 'bottom',
+    'fontsize': 7,
+    'fontweight': 'bold',
+    'fontfamily': 'monospace'
+}
+ax.text(0.2, df[max_anio].max()+13, text, **text_params)
+
+#Se añaden líneas verticales para marcar inicio y fin
+params_lines = {
+    'color': 'black',
+    'alpha': 0.7,
+    'linewidth': 0.7,
+    'linestyle': ':'
+
+}
+ax.axvline(0, **params_lines)
+ax.axvline(1, **params_lines)
+
+#Se agregan los años de comparación
+text_params['ha'] = 'center'
+text_params['fontsize'] = 10
+ax.text(0, df[min_anio].max() + 1.8, min_anio, **text_params)
+ax.text(1, df[min_anio].max() + 1.8, max_anio, **text_params)
+
+ax.axis('off')
+ax.set_title("Comparación del ratio de desempleo entre 2015 y 2022", 
+             fontfamily = 'monospace', fontweight = 'bold', pad = 30)
+plt.tight_layout()
+plt.show()
+```
+
+**Audiencia:** Políticos\
+**Objetivo:** Mostrar aquellos países del mundo donde se ha producido un mayor cambio en cuanto a la creación de empleo entre 2015 y 2023.\
+**Visualización:** Se utiliza Matplotlib de Python. El tipo de gráfica que se ha escogido es un Slope Chart. Se ha resaltado el top 10 de los países con mayor variación entre los años escogidos. Se utilizan distintos colores para resaltar al que ha tenido un mayor cambio con respecto a los demás. Además, se añaden anotaciones para ver de qué países se trata y el cambio producido.\
+**Conjunto de datos:** Se ha escogido una fuente proveniente del tema del día. Se ha hecho un buen preprocesamiento, donde se ha ido filtrando por los datos y columnas de interés con la librería de Pandas. Se podrían haber escogido otras fechas más extremas, como 2014 y 2024. Sin embargo, la cantidad de datos se reducía drásticamente ya que muchos de los países no disponían de datos en esas fechas. El indicador sobre el que se ha calculado la diferencia es el ratio de desempleo, por la SDG (Sustainable Development Goals). Fuente:https://ilostat.ilo.org/topics/sdg/#
 
 ## Categoría: "Uncertainties"
 
 ### Día 25: Global Change
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{python message = FALSE, warning = FALSE, fig.width = 10, fig.height = 15}
+
+import pandas as pd
+import plotly.express as px
+
+#Se carga el dataframe
+ruta = "datasets/SDG_0852_SEX_AGE_RT_A-filtered-2024-10-30_mod.csv"
+df = pd.read_csv(ruta)
+
+#Se revisan las primeras filas del archivo
+print(df.head())
+
+#Se reorganizan los datos para poder graficarse con plotly
+
+#Se eliminan los na para poder representarse sin problemas
+df.dropna(axis = 0, inplace = True)
+
+#Se almacenan en variables pero se reduce el rango para que no se estudien los extremos. Esto se hace para no reducir demasiado el df.
+min_anio = df['time'].min() + 1
+max_anio = df['time'].max() - 1
+
+#Se filtra el df para excluir los años más extremos
+df = df[(df['time']>=min_anio)&(df['time']<=max_anio)]
+
+#Se eliminan los paises que no tengan todos los años intermedios registrados
+country_list = set(df['ref_area.label'].tolist())
+ind_to_drop = []
+for country in country_list:
+    filter = df['ref_area.label'] == country
+    df_ = df[filter]
+    for anio in range(min_anio, max_anio + 1):
+        if anio not in df_['time'].values:
+            ind_to_drop += df[filter].index.to_list()
+            break
+df.drop(ind_to_drop, axis = 0, inplace = True)
+#Se visualiza la cantidad de países restantes
+print(f'Cantidad de países a mostrar: {df.shape[0]}')
+
+#Se ordena por año
+df = df.sort_values(by = 'time')
+
+def plot_animation():
+    global df
+    #Se crea un gráfico de burbujas animado
+    fig = px.scatter(df, x = df['time'], y = df['obs_value'],
+                    size = df['obs_value'], color = df['ref_area.label'],
+                    animation_frame = df['time'], hover_name = df['ref_area.label'])
+
+    fig.update_layout(xaxis_range = [2013, 2023],
+                    yaxis_range = [0, 35],
+                     width=800,  
+                    height=600,
+                     showlegend = False)
+    return fig
+
+fig = plot_animation()
+fig.show()
+```
+
+**Audiencia:** Políticos\
+**Objetivo:** En conjunción con la gráfica anterior, se muestra como se han ido comportando los ratios de desempleo para los adultos de más de 25 años en los distintos países.\
+**Visualización:** Se escoge una visualización animada de Plotly en Python. Concretamente, se anima un Scatter Plot de Burbujas, de forma que se vea según el tamaño una tasa de desempleo mayor o menor y cómo esta va variando.\
+**Conjunto de datos:** Se ha aprovechado la misma fuente que la gráfica anterior a partir de un punto de procesamiento y se ha transformado en consonancia con los requerimientos de esta gráfica. Fuente:https://ilostat.ilo.org/topics/sdg/#
 
 ### Día 26: AI
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{python message = FALSE, warning = FALSE}
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.dates import date2num, DateFormatter
+import matplotlib.dates as mdates
+
+# Generar datos de ejemplo
+np.random.seed(0)
+days = pd.date_range(start='2024-01-01', periods=30, freq='D')
+open_prices = np.random.uniform(low=10, high=50, size=len(days))
+close_prices = open_prices + np.random.uniform(low=-10, high=10, size=len(days))
+high_prices = np.maximum(open_prices, close_prices) + np.random.uniform(low=0, high=5, size=len(days))
+low_prices = np.minimum(open_prices, close_prices) - np.random.uniform(low=0, high=5, size=len(days))
+
+data = pd.DataFrame({
+    'Date': days,
+    'Open': open_prices,
+    'Close': close_prices,
+    'High': high_prices,
+    'Low': low_prices
+})
+
+# Ajustar el formato de fecha
+data['Date'] = pd.to_datetime(data['Date'])
+data['Date'] = date2num(data['Date'])  # Convertir a formato numérico
+
+# Crear el gráfico
+plt.figure(figsize=(12, 6), facecolor='black')
+plt.title('Gráfico Candlestick de IAforPlotsWithGPT', color='white')
+plt.grid(color='gray', linestyle='--', alpha=0.5)
+
+# Dibujar las velas
+for index in range(len(data)):
+    if data['Close'][index] > data['Open'][index]:
+        color = 'green'  # Alcista
+        lower = data['Open'][index]
+        height = data['Close'][index] - data['Open'][index]
+    else:
+        color = 'red'  # Bajista
+        lower = data['Close'][index]
+        height = data['Open'][index] - data['Close'][index]
+
+    plt.bar(data['Date'][index], height, bottom=lower, color=color, alpha=0.7, width=0.5)
+    plt.plot([data['Date'][index], data['Date'][index]], [data['Low'][index], data['High'][index]], color=color, alpha=0.7)
+
+# Configurar los ejes
+plt.ylabel('Cantidad en Euros', color='white')
+plt.xlabel('Días', color='white')
+plt.xticks(data['Date'], [day.strftime('%Y-%m-%d') for day in days], rotation=45, color='white')
+plt.yticks(color='white')
+plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=2))
+plt.gca().set_facecolor('black')
+
+# Mostrar el gráfico
+plt.tight_layout()
+plt.show()
+```
+
+**Audiencia:** Estudiantes de IA\
+**Objetivo:** Mostrar lo eficiente que puede ser usar Chatgpt como creador de gráficas de forma rápida y usando el lenguaje más alto que existe de programación: el lenguaje natural.\
+**Visualización:** Se utiliza un "CandleStick", o gráfico de velas, con Matplotlib de Python.\
+**Conjunto de datos:** El gráfico ha sido generado artificialmente con Chatgpt usando el siguiente prompt:
+
+*Objetivo: Quiero que me generes solamente con Matplotlib y Seaborn en Python un gráfico tipo "Candlestick".*
+
+*Contexto: este gráfico representará los valores en el mercado así como sus precios de Inicio y cierre, máximos y mínimos, de una moneda virtual imaginaria llamada IAforPlotsWithGPT.*
+
+*Detalles de la gráfica:*
+
+*- Eje y: cantidad en euros*
+
+*- Eje x: días del 01/01/2024 hasta 30 días después.*
+
+*- Colores de las velas: los días alcistas en verde y los bajistas en rojo, con una opacidad de alpha = 0.7*
+
+*- Muestra el grid*
+
+*- El gráfico tendrá el fondo oscuro.*
 
 ### Día 27: Good/Bad
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
+```{python message = FALSE, warning = FALSE}
+
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+
+#Se carga el archivo
+ruta = r"datasets\Student_Satisfaction_Survey.csv"
+
+df = pd.read_csv(ruta, encoding = 'latin1')
+
+#Se revisan las primeras filas del archivo
+print(df.info())
+
+#Se toma la suma total de cada campo de resultados de encuesta
+muy_malo = df['Weightage 1'].sum()
+malo = df['Weightage 2'].sum()
+normal = df['Weightage 3'].sum()
+bueno = df['Weightage 4'].sum()
+muy_bueno = df['Weightage 5'].sum()
+
+#Se calcula una puntuación promedio del 1 al 5, de peor a mejor
+puntuaciones = [1] * muy_malo + [2] * malo + [3] * normal + [4] * bueno + [5] * muy_bueno
+
+#Se calcula el valor de la encuesta
+promedio = round(np.mean(puntuaciones),1)
+
+# Crear el gráfico de medidor
+fig = go.Figure(go.Indicator(
+    mode="gauge+number",
+    value=promedio,
+    title={'text': "Encuesta de Satisfacción"},
+    gauge={
+        'axis': {'range': [1, 5], 'tickvals': [1, 2, 3, 4, 5], 'ticktext': ['Muy Malo', 'Malo', 'Neutral', 'Bueno', 'Muy Bueno']},
+        'bar': {'color': "rgba(255, 255, 0, 0.7)"},
+        'steps': [
+            {'range': [1, 2], 'color': "rgba(255, 0, 0, 0.7)"},
+            {'range': [2, 4], 'color': "rgba(0, 0, 255, 0.7)"},
+            {'range': [4, 5], 'color': "rgba(0, 255, 0, 0.7)"},
+        ]
+    }
+))
+
+# Mostrar el gráfico
+fig.show()
+```
+
+**Audiencia:** Coordinador de un Master Universitario\
+**Objetivo:** Mostrar el grado de satisfacción general de los alumnos de un master\
+**Visualización:** Se utiliza el tipo de gráfico **Indicador** de la librería **Plotly** de **Python**.\
+**Conjunto de datos:** Se realiza un recuento de las distintas categorías de satisfacción y se calcula la puntuación media. Fuente:[https://www.kaggle.com/datasets/prasad22/student-satisfaction-survey](#0)
 
 ### Día 28: Trend
 
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
-
-### Día 29: Black'n'White
-
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
-
-### Día 30: FiveThirtyEight (theme day)
-
-**Audiencia:**\
-**Objetivo:**\
-**Visualización:**\
-**Conjunto de datos:**
-
-<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
-</script>
-
-<iframe title="Net Worth (in billions) by Industry" aria-label="Bar Chart" id="datawrapper-chart-SpQmI" src="https://datawrapper.dwcdn.net/SpQmI/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="395" data-external="1">
+<iframe title="¿Existe relación entre la desigualdad de ingresos de un país y su delincuencia? " aria-label="Scatter Plot" id="datawrapper-chart-UMIVn" src="https://datawrapper.dwcdn.net/UMIVn/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="555" data-external="1">
 
 </iframe>
 
 <script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
 </script>
+
+**Audiencia:** Economistas y cargos políticos\
+**Objetivo:** Enfatizar en la necesidad de disminuir la desigualdad de ingresos con el fin de yo sobrepasar ciertos niveles de GINI ya que, parece ser, existe una relación entre el ratio de delincuencia y este índice.\
+**Visualización:** Se escoge la herramienta Datawrapper con el "Scatter plot". Se ha dividido la gráfica por zonas de peligrosidad según la distribución y la guía de una línea de tendencia cúbica, que es la que parece que mejor se ajusta a la distribución.\
+**Conjunto de datos:** No se ha necesitado realizar preprocesamiento más allá de la selección de las columnas adecuadas. Fuente:<https://github.com/fivethirtyeight/data/blob/master/hate-crimes/README.md>
+
+### Día 29: Black'n'White
+
+```{python message = FALSE, warning = FALSE, fig.width = 8, fig.height = 4}
+
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+import re
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+def preprocess_text(text):
+    # Convertir a minúsculas
+    text = text.lower()
+    
+    # Eliminar caracteres especiales y números
+    text = re.sub(r"[^a-zA-Z\s]", "", text)
+    
+    # Tokenizar el texto
+    tokens = word_tokenize(text)
+    
+    # Eliminar palabras vacías (stopwords)
+    stop_words = set(stopwords.words("english"))
+    tokens = [word for word in tokens if word not in stop_words]
+    
+    # Lematización
+    lemmatizer = WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(word) for word in tokens]
+    
+    # Unir tokens en un solo texto procesado
+    processed_text = " ".join(tokens)
+    return processed_text
+
+# Leer el archivo de texto
+ruta = r"C:\Users\Cristian\Documents\5- Educación\6- Master Universitario en Big Data y Ciencias de Datos\2- Asignaturas\7. Visualización de datos\2. Actividades\Actividad1\30daysChartChallenge\datasets\Black_or_white.txt"
+with open(ruta, 'r', encoding='utf-8') as file:
+    texto = file.read()
+# Ejemplo de uso
+texto_procesado = preprocess_text(texto)
+
+wordcloud = WordCloud(width=800, height=400).generate(texto_procesado)
+
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+```
+
+**Audiencia: Concierto Michael Jackson**\
+**Objetivo:** Decorar el escenario incluyendo este tipo de gráficas artísticas sobre sus canciones. Este es un ejemplo de una de las más populares, *Black or White***.**\
+**Visualización:** Se utiliza la librería de wordcloud de Python para la representación de esta gráfica.\
+**Conjunto de datos:** Se utilizan técnicas de procesamiento del lenguaje natural (NPL) con la librería nltk de Python para tokenizar, eliminar palabras vacías y lematizar la canción. Fuente**:** <https://genius.com/Michael-jackson-black-or-white-lyrics>
+
+### Día 30: FiveThirtyEight (theme day)
+
+```{python message = FALSE, warning = FALSE, fig.asp = 0.5}
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+#Se carga el archivo
+ruta = r"datasets\avengers.csv"
+df = pd.read_csv(ruta, encoding = 'latin1')
+
+#Info
+df.info()
+
+#Selecciono las columnas de interés
+df = df[['Name/Alias', 'Appearances', 'Current?', 'Gender', 'Year', 'Years since joining', 'Years since joining',
+         'Honorary']]
+
+#Creo una categoría más: outliers. Esta se va a calcular por separado, para los hombres y para las mujeres
+def calc_outliers(data):
+    Q1, Q2, Q3 = data.quantile([0.25, 0.5, 0.75])
+    IQR = Q3 - Q1
+    lim_sup = Q3 + 1.5 * IQR
+    return lim_sup
+
+#Llamo a la función para calcular los límites sup e inf de outliers según género
+lim_sup_male = calc_outliers(df['Appearances'][df['Gender'] == 'MALE'])
+lim_sup_fem = calc_outliers(df['Appearances'][df['Gender'] == 'FEMALE'])
+
+#Instancio una nueva columna con valores None
+df['Importance'] = None
+
+#Ahora filtro por género y le doy un valor a la la columna creada en función de los límites de "normalidad"
+df['Importance'][df['Gender']=='MALE'] = df['Appearances'][df['Gender']=='MALE'].apply(lambda x: 'VIP' if x >= lim_sup_male else 'Normal')
+df['Importance'][df['Gender']=='FEMALE'] = df['Appearances'][df['Gender']=='FEMALE'].apply(lambda x: 'VIP' if x >= lim_sup_fem else 'Normal')
+
+#Ahora se crea una nueva columna combinando el género y su importancia
+df['Gender_Importance'] = df['Importance'] + '-' + df['Gender']
+
+def plot_kdes():
+  
+  #Se establece el estilo
+  sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
+  
+  # Initialize the FacetGrid object
+  pal = sns.cubehelix_palette(10, rot=-.25, light=.7)
+  g = sns.FacetGrid(df, row="Gender_Importance", hue="Gender_Importance", aspect=5, height=3, palette=pal)
+  
+  # Draw the densities in a few steps
+  g.map(sns.kdeplot, "Appearances",
+        bw_adjust=.5, clip_on=False,
+        fill=True, alpha=0.7, linewidth=1.5)
+  g.map(sns.kdeplot, "Appearances", clip_on=False, color="w", lw=2, bw_adjust=.5)
+  
+  # passing color=None to refline() uses the hue mapping
+  g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
+  
+  
+  # Define and use a simple function to label the plot in axes coordinates
+  def label(x, color, label):
+      ax = plt.gca()
+      ax.text(0, .2, label, fontweight="bold", color=color,
+              ha="left", va="center", transform=ax.transAxes)
+  
+  g.map(label, "Appearances")
+  
+  # Define a function to label each facet with unique text
+  def add_text_to_facets(g):
+    global df
+    df.sort_values(by = 'Appearances', ascending = False, inplace = True)
+    for ax in g.axes.flat:
+        # Se obtiene la importancia y género del facet
+        categoria = ax.get_title().replace('Gender_Importance = ', "")
+        # Define el TOP 3 de los personajes con más apariciones
+        top_3 = df['Name/Alias'][df['Gender_Importance']==categoria].head(3    ).to_list()
+        text = f"TOP 3: {",".join(top_3)}"  # Cambia esto por el texto que desees
+        # Agrega el texto al facet
+        ax.text(0.5, 0.5, text, fontsize=12, ha='center', va='center', transform=ax.transAxes,
+                fontweight = 'bold', color = 'black')
+  
+  # Llama a la función para agregar texto a cada facet
+  add_text_to_facets(g)
+  
+  # Set the subplots to overlap
+  g.figure.subplots_adjust(hspace=-.25)
+  
+  # Remove axes details that don't play well with overlap
+  g.set_titles("")
+  g.set(yticks=[], ylabel="")
+  g.despine(bottom=True, left=True)
+  return g
+
+
+g = plot_kdes()
+plt.show()
+```
+
+**Audiencia:** Exposición sobre comics de Marvel\
+**Objetivo:** Presentar al público más aficionado a los comics de Marvel las distribuciones de cantidad de apariciones distinguido por género e importancia. Además, se resalta el top 3 de los personajes que más aparecen dentro de cada grupo.\
+**Visualización:** Se usa Seaborn de Python. El tipo de gráfica es una kde (Kernel Density Estimation) para observar el tipo de districución que se da en cada grupo. Se observa que, mientras que el grupo VIP de las mujeres la distribución está más concentrada alrededor de las 1000-1500 apariciones, en el grupo de los hombres VIP se tienen unas colas muy largas y una gráfica de probabilidad poco densa, estando los personajes muy expandidos en apariciones entre 1000 y 4500.\
+**Conjunto de datos:** Se ha realizado un preprocesamiento para detectar los outliers por apariciones y asi definir la importancia de la población diferenciada por hombres y mujeres. De esta manera, se puede graficar el kde diferenciado en cuatro categorías, lo cual da una mejor información visual. Fuente:<https://github.com/fivethirtyeight/data/blob/master/avengers/avengers.csv>
+
+# Principales Fuentes y referencias
+
+*Se ha usado documentación y recursos externos como apoyo para la creación de todas las gráficas en este documento, las cuales son completamente originales. Fuentes:*
+
+## Python
+
+-   <https://matplotlib.org/3.1.1/api/index.html>
+
+-   <https://seaborn.pydata.org/api.html>
+
+-   <https://plotly.com/python-api-reference/>
+- <https://wordcloudapi.com/>
+
+## R
+- <https://r-charts.com/es/ggplot2/>
+- <https://exts.ggplot2.tidyverse.org/>
+
+## General
+- <https://chatgpt.com/> 
