@@ -1,5 +1,5 @@
 ---
-title: "30DaysChanllenge"
+title: "30DaysChartChallenge"
 author: "Cristian Guerrero Balber"
 editor: visual
 format:
@@ -1615,11 +1615,14 @@ plt.show()
 -   <https://seaborn.pydata.org/api.html>
 
 -   <https://plotly.com/python-api-reference/>
-- <https://wordcloudapi.com/>
+
+-   <https://wordcloudapi.com/>
 
 ## R
-- <https://r-charts.com/es/ggplot2/>
-- <https://exts.ggplot2.tidyverse.org/>
+
+-   <https://r-charts.com/es/ggplot2/>
+-   <https://exts.ggplot2.tidyverse.org/>
 
 ## General
-- <https://chatgpt.com/> 
+
+-   <https://chatgpt.com/>
